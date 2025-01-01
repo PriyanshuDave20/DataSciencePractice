@@ -86,8 +86,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from hpelm import ELM
-from keras.models import Sequential
-from keras.layers import Dense, Conv1D, Flatten
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv1D, Flatten
 import yfinance as yf
 from scipy import stats
 
