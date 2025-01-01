@@ -84,6 +84,7 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 from hpelm import ELM
 from keras.models import Sequential
 from keras.layers import Dense, Conv1D, Flatten
@@ -126,6 +127,31 @@ def preprocess_data():
     return data
 
 def initialize_models(input_dim):
+    param_grid1 = {
+    'n_estimators': [50, 100, 200, 500],
+    'max_depth': [None, 10, 20, 30],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['auto', 'sqrt', 'log2'],
+    'bootstrap': [True, False]
+}
+    param_grid2 = {
+        'n_estimators': np.linspace(50, 1000, 20).astype(int),
+        'learning_rate': [0.01, 0.05, 0.1, 0.2, 0.3],
+        'max_depth': [3, 5, 7, 10],
+        'min_samples_split': [2, 5, 10, 20],
+        'min_samples_leaf': [1, 2, 4, 10],
+        'subsample': [0.5, 0.7, 1.0],
+        'max_features': [None, 'sqrt', 'log2']
+    }
+    param_grid3 = {
+    'alpha': [0.01, 0.1, 1.0, 10, 100],
+    'l1_ratio': [0, 0.1, 0.5, 0.9, 1],
+    'max_iter': [1000, 5000, 10000],
+    'tol': [1e-4, 1e-5, 1e-6],
+    'fit_intercept': [True, False],
+    'normalize': [True, False]
+    }
     models = {
         'Linear Regression': LinearRegression(),
         'Support Vector Regression': MultiOutputRegressor(SVR(kernel='rbf', C=10, gamma='scale')),
@@ -141,9 +167,9 @@ def initialize_models(input_dim):
             Dense(64, activation='relu'),
             Dense(1)
         ]),
-        'Random Forest Regression': RandomForestRegressor(n_estimators=100, random_state=42),
-        'Gradient Boosting Regression': MultiOutputRegressor(GradientBoostingRegressor(n_estimators=200, learning_rate=0.05, max_depth=3)),
-        'Elastic Net': ElasticNet(alpha=0.01, l1_ratio=1.0),
+        'Random Forest Regression': GridSearchCV(estimator=RandomForestRegressor(n_estimators=100, random_state=42), param_grid=param_grid1, cv=5),
+        'Gradient Boosting Regression': MultiOutputRegressor(GridSearchCV(estimator=GradientBoostingRegressor(n_estimators=200, learning_rate=0.05, max_depth=3), param_grid=param_grid2, cv=5)),
+        'Elastic Net': GridSearchCV(estimator=ElasticNet(alpha=0.01, l1_ratio=1.0), param_grid=param_grid3, cv=5),
         'K Nearest Neighbours': KNeighborsRegressor(n_neighbors=2),
         'Extreme Learning Machine': ELM(input_dim, 1),
         'Bayesian Ridge': MultiOutputRegressor(BayesianRidge())
