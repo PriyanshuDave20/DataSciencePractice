@@ -107,7 +107,6 @@ names = [
     'Elastic Net', 'K Nearest Neighbours', 'Extreme Learning Machine', 'Bayesian Ridge'
 ]
 
-# Functions
 def preprocess_data():
     data = yf.download(tickers, start=start_date, end=end_date)
     data.dropna(inplace=True)
